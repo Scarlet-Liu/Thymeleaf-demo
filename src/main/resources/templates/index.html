@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<!-- 引入thymeleaf的命名空间 -->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>[[#{app.report.name}]]</title>
+    <link href="css/bootstrap.css" type="text/css" rel="stylesheet"></link>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.js"></script>
+    <style type="text/css">
+        .pagination {
+            margin: 0px
+        }
+
+        .pagination > li > a, .pagination > li > span {
+            margin: 0 5px;
+            border: 1px solid #dddddd;
+        }
+
+        .glyphicon {
+            margin-right: 3px;
+        }
+        .highlight{
+        	background-color:lightgreen;
+        }
+    </style>
+</head>
+<body>
+<!-- 模板引用，th:insert 模板名 ：： 模板id -->
+<div th:insert="header_footer :: header"></div>
+<div class="container">
+    <div class="row">
+        <div>
+            <ol class="breadcrumb" style="background-color:transparent;font-size: 20px">
+                <li><a th:href="#{app.website}">首页</a></li>
+                <li class="active">实战案例</li>
+                <li class="active">thymeleaf模板引擎实战</li>
+            </ol>
+        </div>
+        <!-- th:text= 代表将内容输出到标签体 -->
+        <!-- #{app.report.name} 读取massages.properties相应的属性 -->
+        <h1 style="..." th:text="#{app.report.name}"></h1>
+        <div class="panel panel-default">
+            <div class="clearfix panel-heading ">
+
+                <div class="input-group" style="width: 500px;">
+                <!-- param 相当于用于获取请求参数 -->
+                    <input id="txtKeyword" type="text" class="form-control" placeholder="请输入要查询的员工" th:value="${param.keyword}">
+                    <div class="input-group-btn">
+                        <button class="btn btn-primary" id="btnQuery">
+                        <span class="glyphicon glyphicon-zoom-in"></span>查询</button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>员工编号</th>
+                    <th>姓名</th>
+                    <th>部门</th>
+                    <th>岗位</th>
+                    <th>入职时间</th>
+                    <th>工资</th>
+                    <th>奖金</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- #{} 用于读取常亮，配置文件中的信息 -->
+                <!-- ${} 用于读取变量，程序中的变量 -->
+                
+                <tr th:each="emp,stat:${emps}" th:class="${emp.job == 'MANAGER' || emp.job == 'PRESIDENT'} ? 'highlight':''">
+                <!-- stat用于序号 -->
+                    <td>[[${stat.index+1}]]</td>
+                    <td th:text="${emp.empno}"></td>
+                    <td th:style="${emp.sal > 2000}?'color:red;font-weight:bold;'" th:text="${#strings.toLowerCase(emp.ename)}"></td>
+                    <td th:switch="${emp.dname}">
+                    	<span th:case="RESEARCH">研发部</span>
+                    	<span th:case="SALES">销售部</span>
+                    	<span th:case="ACCOUNTING">会记部</span>                    	
+                    </td>
+                    <td>[[${emp.job}]]</td>
+                    <td>[[${#dates.format(emp.hiredate,'yyyy年mm月dd日')}]]</td>
+                    <td th:style="${emp.sal > 2000}?'color:red;font-weight:bold;'">[[${#numbers.formatCurrency(emp.sal)}]]</td>
+                    <td th:text="${emp.comm!=null}? ${#numbers.formatCurrency(emp.comm)}:'N/A'"></td>
+                    <td style="text-align: center">
+                        <button class="btn btn-xs btn-info"></span>详细</button>
+                        <button class="btn btn-xs btn-warning"></span>删除</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+	//绑定单击事件
+	document.getElementById("btnQuery").onclick = function(ev){
+		//alert("aaa")弹出提示框
+		var url = "/?keyword=" + document.getElementById("txtKeyword").value;
+		//跳转url地址
+		window.location.href = url;
+	}
+</script>
+</body>
+</html>
